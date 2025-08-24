@@ -31,52 +31,41 @@ let garden = null;
 let countDisplay = null;
 let flowerButton = null;
 
-// Initialize the game when the page loads
 document.addEventListener('DOMContentLoaded', function() {
     garden = document.getElementById('garden');
     countDisplay = document.getElementById('count');
     flowerButton = document.getElementById('flower-button');
     
-    // Add click event listener to the button
     flowerButton.addEventListener('click', growFlower);
     
-    // Add some initial decoration to the garden
     createInitialGarden();
 });
 
-// Function to grow a new flower
 function growFlower() {
-    // Get a random flower
     const randomFlower = flowers[Math.floor(Math.random() * flowers.length)];
     
-    // Create flower element
     const flowerElement = document.createElement('div');
     flowerElement.className = `flower ${randomFlower.class}`;
     flowerElement.innerHTML = randomFlower.emoji;
     flowerElement.title = randomFlower.name;
     
-    // Add click event to individual flowers
     flowerElement.addEventListener('click', function() {
         showLoveMessage(randomFlower.name);
         createSparkles(flowerElement);
     });
     
-    // Add the flower to the garden
     garden.appendChild(flowerElement);
     
-    // Update flower count
     flowerCount++;
     countDisplay.textContent = flowerCount;
     
     // Add button feedback
     addButtonFeedback();
     
-    // Show a sweet message occasionally
     if (flowerCount % 5 === 0) {
         showSweetMessage();
     }
     
-    // Remove old flowers if too many (keep garden manageable)
     if (garden.children.length > 20) {
         const oldestFlower = garden.firstChild;
         oldestFlower.style.animation = 'fadeOut 0.5s ease-out';
@@ -88,7 +77,6 @@ function growFlower() {
     }
 }
 
-// Add visual feedback to button
 function addButtonFeedback() {
     flowerButton.style.transform = 'scale(0.95)';
     setTimeout(() => {
@@ -96,7 +84,6 @@ function addButtonFeedback() {
     }, 150);
 }
 
-// Show sweet messages
 function showSweetMessage() {
     const message = sweetMessages[Math.floor(Math.random() * sweetMessages.length)];
     
@@ -127,13 +114,12 @@ function showSweetMessage() {
     }, 4000);
 }
 
-// Show love message when clicking on individual flowers
 function showLoveMessage(flowerName) {
     const loveMessages = [
-        `${flowerName} - as beautiful as you! 💕`,
-        `This ${flowerName} reminds me of you! 😍`,
-        `${flowerName} for my flower! 🌸`,
-        `You're more beautiful than any ${flowerName}! 💖`
+        `${flowerName} - as beautiful as you`,
+        `This ${flowerName} reminds me of you`,
+        `${flowerName} for my flower`,
+        `You're more beautiful than any ${flowerName}`
     ];
     
     const message = loveMessages[Math.floor(Math.random() * loveMessages.length)];
@@ -166,7 +152,6 @@ function showLoveMessage(flowerName) {
     }, 3000);
 }
 
-// Create sparkle effect
 function createSparkles(element) {
     for (let i = 0; i < 6; i++) {
         setTimeout(() => {
@@ -190,9 +175,7 @@ function createSparkles(element) {
     }
 }
 
-// Create initial garden decoration
 function createInitialGarden() {
-    // Add some grass and decoration
     for (let i = 0; i < 3; i++) {
         setTimeout(() => {
             const grass = document.createElement('div');
@@ -210,7 +193,6 @@ function createInitialGarden() {
     }
 }
 
-// Add CSS animations for messages
 const style = document.createElement('style');
 style.textContent = `
     @keyframes slideDown {
@@ -251,7 +233,6 @@ style.textContent = `
 `;
 document.head.appendChild(style);
 
-// Add keyboard support (press Space to grow flower)
 document.addEventListener('keydown', function(event) {
     if (event.code === 'Space') {
         event.preventDefault();
@@ -259,16 +240,15 @@ document.addEventListener('keydown', function(event) {
     }
 });
 
-// Add some Easter eggs for special numbers
 function checkSpecialNumbers() {
     if (flowerCount === 10) {
-        showSpecialMessage("Double digits! You're amazing! 🎉");
+        showSpecialMessage("Double digits You're amazing");
     } else if (flowerCount === 25) {
-        showSpecialMessage("Quarter century of flowers! 🎊");
+        showSpecialMessage("Quarter century of flowers");
     } else if (flowerCount === 50) {
-        showSpecialMessage("Fifty flowers of love! 💕");
+        showSpecialMessage("Fifty flowers of love");
     } else if (flowerCount === 100) {
-        showSpecialMessage("A hundred flowers! You're incredible! 🌈");
+        showSpecialMessage("A hundred flowers You're incredible");
     }
 }
 
