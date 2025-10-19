@@ -22,7 +22,7 @@ const sweetMessages = [
     "You make my heart blossom ",
     "Sweet as honey, beautiful as flowers",
     "My love grows like these flowers",
-    "You're my sunshin!",
+    "You're my sunshine!",
     "Forever and always"
 ];
 
