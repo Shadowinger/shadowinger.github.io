@@ -3,9 +3,8 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
-    <title>Miffy Mobile World - Offline Ready</title>
+    <title>Miffy</title>
     <style>
-        /* --- CSS: Ponecháno stejné jako ve tvém originálu --- */
         :root { --bg-color: #f0f4f8; --primary: #5d4037; --accent: #ff9a9e; }
         body { font-family: 'Segoe UI', sans-serif; background-color: var(--bg-color); margin: 0; display: flex; justify-content: center; align-items: center; height: 100vh; overflow: hidden; user-select: none; }
         #game-frame { position: relative; width: 800px; height: 600px; background-color: #fff; border: 10px solid #333; border-radius: 20px; overflow: hidden; display: flex; flex-direction: column; }
@@ -103,7 +102,6 @@
             currentRoom: 'room-kitchen'
         };
 
-        // --- UI FUNKCE ---
         let popupTimer;
         function showPopup(text) {
             const popup = document.getElementById('custom-popup');
@@ -122,7 +120,6 @@
             document.getElementById('bar-sleep').style.width = stats.sleep + "%";
             document.getElementById('bar-fun').style.width = stats.fun + "%";
 
-            // Přesouvání Miffyho
             const miffy = document.getElementById('miffy-img');
             if (stats.currentRoom === 'room-kitchen') {
                 document.getElementById('miffy-container').appendChild(miffy);
@@ -132,7 +129,6 @@
             saveGame();
         }
 
-        // --- HERNÍ AKCE ---
         function eatFood(amount, foodName) {
             if (stats.hunger >= 100) {
                 showPopup("jsem full 🐰");
@@ -160,7 +156,6 @@
             updateUI();
         }
 
-        // --- LOCAL STORAGE ---
         function saveGame() {
             localStorage.setItem('miffyMobileV1', JSON.stringify(stats));
         }
@@ -174,7 +169,6 @@
             }
         }
 
-        // --- FLAPPY BIRD (UPRAVENO PRO MOBIL) ---
         let gameRunning = false;
         let bird = { x: 50, y: 150, velocity: 0 };
         let pipes = [];
@@ -209,7 +203,7 @@
         }
 
         function flap(e) {
-            if (e) e.preventDefault(); // Zabrání scrollování na mobilu
+            if (e) e.preventDefault(); 
             if (gameRunning) bird.velocity = -5;
         }
 
@@ -220,10 +214,9 @@
         function loop() {
             if (!gameRunning) return;
 
-            bird.velocity += 0.25; // Gravitace
+            bird.velocity += 0.25; 
             bird.y += bird.velocity;
 
-            // Generování trubek
             if (pipes.length === 0 || pipes[pipes.length - 1].x < 180) {
                 let gapPos = Math.random() * (canvas.height - 150) + 20;
                 pipes.push({ x: canvas.width, gap: 110, topH: gapPos });
@@ -231,7 +224,6 @@
 
             pipes.forEach(p => p.x -= 2);
 
-            // Kolize
             if (bird.y > canvas.height || bird.y < 0) resetGame();
 
             pipes.forEach(p => {
@@ -241,22 +233,18 @@
                 }
             });
 
-            // Vykreslování
             ctx.fillStyle = '#70c5ce';
             ctx.fillRect(0, 0, canvas.width, canvas.height);
 
-            // Ptáček
             ctx.fillStyle = 'white';
             ctx.beginPath();
             ctx.arc(bird.x, bird.y, 12, 0, Math.PI * 2);
             ctx.fill();
             ctx.strokeStyle = '#333'; ctx.lineWidth = 2; ctx.stroke();
-            // Oko a ucho
             ctx.fillStyle = 'black'; ctx.beginPath(); ctx.arc(bird.x + 5, bird.y - 2, 2, 0, Math.PI * 2); ctx.fill();
             ctx.beginPath(); ctx.ellipse(bird.x - 2, bird.y - 15, 4, 10, 0, 0, Math.PI * 2); ctx.fillStyle = 'white'; ctx.fill(); ctx.stroke();
 
 
-            // Trubky
             ctx.fillStyle = '#81c784';
             ctx.strokeStyle = '#2e7d32';
             pipes.forEach(p => {
@@ -278,8 +266,6 @@
             updateUI();
         }, 3000);
 
-        // 2. Oprava funkce closeTV pro přičítání zábavy
-        // (Tato funkce přepíše tu původní prázdnou/nefunkční)
         function closeTV() {
             gameRunning = false;
             cancelAnimationFrame(loopRef);
