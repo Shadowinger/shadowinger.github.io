@@ -1,0 +1,297 @@
+<!DOCTYPE html>
+<html lang="cs">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+    <title>Miffy Mobile World - Offline Ready</title>
+    <style>
+        /* --- CSS: Ponecháno stejné jako ve tvém originálu --- */
+        :root { --bg-color: #f0f4f8; --primary: #5d4037; --accent: #ff9a9e; }
+        body { font-family: 'Segoe UI', sans-serif; background-color: var(--bg-color); margin: 0; display: flex; justify-content: center; align-items: center; height: 100vh; overflow: hidden; user-select: none; }
+        #game-frame { position: relative; width: 800px; height: 600px; background-color: #fff; border: 10px solid #333; border-radius: 20px; overflow: hidden; display: flex; flex-direction: column; }
+        @media (max-width: 600px) { #game-frame { width: 100%; height: 100%; border: none; border-radius: 0; } }
+        #top-ui { background: #eee; padding: 10px; border-bottom: 2px solid #ccc; display: flex; justify-content: space-between; }
+        .stat-group { width: 32%; text-align: center; font-weight: bold; font-size: 0.9rem; }
+        .bar-container { width: 100%; height: 15px; background-color: #555; border-radius: 10px; margin-top: 5px; overflow: hidden; }
+        .bar-fill { height: 100%; width: 50%; transition: width 0.4s ease-out; }
+        #bar-hunger { background: linear-gradient(90deg, #ff9a9e, #ff5e62); }
+        #bar-sleep { background: linear-gradient(90deg, #a1c4fd, #c2e9fb); }
+        #bar-fun { background: linear-gradient(90deg, #fbc2eb, #a6c1ee); }
+        .room { flex-grow: 1; display: none; flex-direction: column; align-items: center; justify-content: space-between; padding: 20px 10px; width: 100%; }
+        .active-room { display: flex; }
+        #room-kitchen { background-color: #fff8e1; } 
+        #room-bedroom { background-color: #e3f2fd; }
+        .items-row { display: flex; gap: 10px; justify-content: center; background: rgba(255,255,255,0.7); padding: 10px; border-radius: 15px; width: 100%; max-width: 600px; }
+        .item-card { display: flex; flex-direction: column; align-items: center; cursor: pointer; background: white; padding: 8px; border-radius: 10px; border: 1px solid #ddd; min-width: 60px; }
+        .item-card:active { transform: scale(0.9); }
+        .item-img { width: 50px; height: 50px; object-fit: contain; }
+        .item-label { font-size: 11px; margin-top: 5px; font-weight: bold; }
+        .restore-badge { background: #4caf50; color: white; font-size: 9px; padding: 2px 4px; border-radius: 4px; }
+        #miffy-img { width: 180px; height: auto; }
+        .nav-btn { padding: 15px 30px; background: #5d4037; color: white; border: none; border-radius: 50px; font-weight: bold; cursor: pointer; width: 90%; max-width: 300px; margin-bottom: 10px; }
+        #custom-popup { position: absolute; top: 60px; left: 50%; transform: translateX(-50%); background: white; padding: 10px 20px; border-radius: 20px; border: 2px solid #ff9a9e; display: none; z-index: 999; }
+        #tv-screen { position: absolute; top: 0; left: 0; width: 100%; height: 100%; background: rgba(0,0,0,0.95); z-index: 100; display: none; flex-direction: column; align-items: center; justify-content: center; color: white; }
+        canvas { background: #70c5ce; border: 4px solid white; max-width: 95%; touch-action: none; }
+    </style>
+</head>
+<body>
+
+    <div id="game-frame">
+        <div id="custom-popup">Zpráva hry...</div>
+
+        <div id="top-ui">
+            <div class="stat-group">HLAD <div class="bar-container"><div id="bar-hunger" class="bar-fill"></div></div></div>
+            <div class="stat-group">SPÁNEK <div class="bar-container"><div id="bar-sleep" class="bar-fill"></div></div></div>
+            <div class="stat-group">ZÁBAVA <div class="bar-container"><div id="bar-fun" class="bar-fill"></div></div></div>
+        </div>
+
+        <div id="room-kitchen" class="room active-room">
+            <div class="items-row">
+                <div class="item-card" onclick="eatFood(15, 'Mrkvičku')">
+                    <img src="data:image/svg+xml;base64,PHN2ZyB2aWV3Qm94PSIwIDAgMjQgMjQiIGZpbGw9Im5vbmUiIHhtbG5zPSJodHRwOi8vd3d3LnczLm9yZy8yMDAwL3N2ZyI+PHBhdGggZD0iTTIuMjI0IDE5LjM1YTIuNzE1IDIuNzE1IDAgMCAwIDMuODI2IDMuODI2bDExLjctMTEuN2ExMi42MTQgMTIuNjE0IDAgMCAwLTMuODI2LTMuODI2bC0xMS43IDExLjd6IiBmaWxsPSIjRkY3MDBFIi8+PHBhdGggZD0iTTE4Ljg5OSA2LjIxNGE1LjUyNiA1LjUyNiAwIDAgMC0xLjU1OC0uNzIzbC0yLjIzNSAyLjIzNWE3LjA2IDcuMDYgMCAwIDEgMi44MzUgMi44MzVsMi4yMzUtMi4yMzVhNS41MjYgNS41MjYgMCAwIDAtMS4yNzItMi4xMTd6IiBmaWxsPSIjRkY3MDBFIi8+PHBhdGggZD0iTTIxLjM2MyAyLjYzN2ExLjcyIDEuNzIgMCAwIDAtMi40MzMgMGwtMS4xNzEgMS4xNzFhNS41MjYgNS41MjYgMCAwIDEgMS4yNzIgMi4xMTcgNS41MjYgNS41MjYgMCAwIDEgLjcyMyAxLjU1OGwxLjE3MS0xLjE3MWExLjcyIDEuNzIgMCAwIDAgMC0yLjQzM3oiIGZpbGw9IiM0Q0FGNTAiLz48L3N2Zz4=" class="item-img" alt="Mrkev">
+                    <span class="item-label">Mrkev</span>
+                    <span class="restore-badge">+15%</span>
+                </div>
+                <div class="item-card" onclick="eatFood(30, 'Dortík')">
+                    <img src="data:image/svg+xml;base64,PHN2ZyB2aWV3Qm94PSIwIDAgMjQgMjQiIGZpbGw9Im5vbmUiIHhtbG5zPSJodHRwOi8vd3d3LnczLm9yZy8yMDAwL3N2ZyI+PHBhdGggZD0iTTEyIDJMMiAxMXY5YTIgMiAwIDAgMCAyIDJoMTZhMiAyIDAgMCAwIDItOXYtOUwxMiAycyIgZmlsbD0iI0ZGRERCNCIvPjxwYXRoIGQ9Ik0yIDExczMgMS41IDUgMGM0IDMgOCAwaDUiIGZpbGw9IiNFOTFFNjMiLz48L3N2Zz4=" class="item-img" alt="Dort">
+                    <span class="item-label">Dort</span>
+                    <span class="restore-badge">+30%</span>
+                </div>
+                <div class="item-card" onclick="eatFood(20, 'Polévku')">
+                    <img src="data:image/svg+xml;base64,PHN2ZyB2aWV3Qm94PSIwIDAgMjQgMjQiIGZpbGw9Im5vbmUiIHhtbG5zPSJodHRwOi8vd3d3LnczLm9yZy8yMDAwL3N2ZyI+PHBhdGggZD0iTTIgMTJhMTAgMTAgMCAwIDAgMjAgMHYtMkgyeiIgZmlsbD0iI0ZGQjMwMCIvPjxwYXRoIGQ9Ik00IDhoMTZ2MmgtMTZ6IiBmaWxsPSIjRkZEMzAwIi8+PC9zdmc+" class="item-img" alt="Polevka">
+                    <span class="item-label">Polévka</span>
+                    <span class="restore-badge">+20%</span>
+                </div>
+                <div class="item-card" onclick="openTV()" style="border-color: #a6c1ee;">
+                    <img src="gamepad-svgrepo-com.svg" class="item-img">
+                    <span class="item-label">Hry</span>
+                </div>
+            </div>
+
+            <div id="miffy-container">
+                <img id="miffy-img" src="miffy.png" alt="Miffy">
+            </div>
+
+            <button class="nav-btn" onclick="goToRoom('room-bedroom')">Jít do Ložnice ➡</button>
+        </div>
+
+        <div id="room-bedroom" class="room">
+            <div class="items-row">
+                <div class="item-card" onclick="doSleep()" style="width: 100px;">
+                    <img src="data:image/svg+xml;base64,PHN2ZyB2aWV3Qm94PSIwIDAgMjQgMjQiIGZpbGw9Im5vbmUiIHhtbG5zPSJodHRwOi8vd3d3LnczLm9yZy8yMDAwL3N2ZyI+PHJlY3QgeD0iMiIgeT0iMTQiIHdpZHRoPSIyMCIgaGVpZ2h0PSI0IiByeD0iMSIgZmlsbD0iIzVENDAzNyIvPjxwYXRoIGQ9Ik00IDExaDR2M0g0eiIgZmlsbD0iI2FjYyIvPjwvc3ZnPg==" class="item-img">
+                    <span class="item-label">Jít spát</span>
+                </div>
+            </div>
+            <div id="miffy-container-bedroom"></div>
+            <button class="nav-btn" onclick="goToRoom('room-kitchen')">⬅ Zpět do Kuchyně</button>
+        </div>
+
+        <div id="tv-screen">
+            <h2>Flappy Bunny</h2>
+            <canvas id="gameCanvas" width="320" height="400"></canvas>
+            <p>Skóre: <strong id="scoreVal">0</strong></p>
+            <button class="nav-btn" onclick="closeTV()">Vypnout TV</button>
+        </div>
+    </div>
+
+ <script>
+        // --- DATA HRY ---
+        let stats = {
+            hunger: 60,
+            sleep: 60,
+            fun: 60,
+            currentRoom: 'room-kitchen'
+        };
+
+        // --- UI FUNKCE ---
+        let popupTimer;
+        function showPopup(text) {
+            const popup = document.getElementById('custom-popup');
+            popup.innerText = text;
+            popup.style.display = 'block';
+            if (popupTimer) clearTimeout(popupTimer);
+            popupTimer = setTimeout(() => { popup.style.display = 'none'; }, 2000);
+        }
+
+        function updateUI() {
+            if (stats.hunger > 100) stats.hunger = 100;
+            if (stats.sleep > 100) stats.sleep = 100;
+            if (stats.fun > 100) stats.fun = 100;
+
+            document.getElementById('bar-hunger').style.width = stats.hunger + "%";
+            document.getElementById('bar-sleep').style.width = stats.sleep + "%";
+            document.getElementById('bar-fun').style.width = stats.fun + "%";
+
+            // Přesouvání Miffyho
+            const miffy = document.getElementById('miffy-img');
+            if (stats.currentRoom === 'room-kitchen') {
+                document.getElementById('miffy-container').appendChild(miffy);
+            } else {
+                document.getElementById('miffy-container-bedroom').appendChild(miffy);
+            }
+            saveGame();
+        }
+
+        // --- HERNÍ AKCE ---
+        function eatFood(amount, foodName) {
+            if (stats.hunger >= 100) {
+                showPopup("jsem full 🐰");
+                return;
+            }
+            stats.hunger += amount;
+            showPopup(`Mňam! ${foodName} je super.`);
+            updateUI();
+        }
+
+        function doSleep() {
+            stats.sleep += 50;
+            showPopup("Dobrou noc... 💤");
+            document.getElementById('room-bedroom').style.opacity = '0.3';
+            setTimeout(() => {
+                document.getElementById('room-bedroom').style.opacity = '1';
+                updateUI();
+            }, 1000);
+        }
+
+        function goToRoom(roomId) {
+            document.querySelectorAll('.room').forEach(el => el.classList.remove('active-room'));
+            document.getElementById(roomId).classList.add('active-room');
+            stats.currentRoom = roomId;
+            updateUI();
+        }
+
+        // --- LOCAL STORAGE ---
+        function saveGame() {
+            localStorage.setItem('miffyMobileV1', JSON.stringify(stats));
+        }
+        function loadGame() {
+            const saved = localStorage.getItem('miffyMobileV1');
+            if (saved) {
+                stats = JSON.parse(saved);
+                goToRoom(stats.currentRoom);
+            } else {
+                updateUI();
+            }
+        }
+
+        // --- FLAPPY BIRD (UPRAVENO PRO MOBIL) ---
+        let gameRunning = false;
+        let bird = { x: 50, y: 150, velocity: 0 };
+        let pipes = [];
+        let score = 0;
+        let canvas = document.getElementById('gameCanvas');
+        let ctx = canvas.getContext('2d');
+        let loopRef;
+
+        function openTV() {
+            document.getElementById('tv-screen').style.display = 'flex';
+            resetGame();
+            gameRunning = true;
+            loop();
+        }
+
+        function closeTV() {
+            gameRunning = false;
+            cancelAnimationFrame(loopRef);
+            document.getElementById('tv-screen').style.display = 'none';
+            if (score > 0) {
+                let bonus = Math.floor(score * 3);
+                stats.fun += bonus;
+                showPopup(`Hraní tě bavilo! (+${bonus}% zábavy)`);
+                updateUI();
+            }
+        }
+
+        function resetGame() {
+            bird.y = 150; bird.velocity = 0;
+            pipes = []; score = 0;
+            document.getElementById('scoreVal').innerText = score;
+        }
+
+        function flap(e) {
+            if (e) e.preventDefault(); // Zabrání scrollování na mobilu
+            if (gameRunning) bird.velocity = -5;
+        }
+
+        // Ovládání pro myš i dotyk
+        canvas.addEventListener('mousedown', flap);
+        canvas.addEventListener('touchstart', flap, { passive: false });
+
+        function loop() {
+            if (!gameRunning) return;
+
+            bird.velocity += 0.25; // Gravitace
+            bird.y += bird.velocity;
+
+            // Generování trubek
+            if (pipes.length === 0 || pipes[pipes.length - 1].x < 180) {
+                let gapPos = Math.random() * (canvas.height - 150) + 20;
+                pipes.push({ x: canvas.width, gap: 110, topH: gapPos });
+            }
+
+            pipes.forEach(p => p.x -= 2);
+
+            // Kolize
+            if (bird.y > canvas.height || bird.y < 0) resetGame();
+
+            pipes.forEach(p => {
+                if (p.x === 10) { score++; document.getElementById('scoreVal').innerText = score; }
+                if (bird.x + 20 > p.x && bird.x < p.x + 40) {
+                    if (bird.y < p.topH || bird.y > p.topH + p.gap) resetGame();
+                }
+            });
+
+            // Vykreslování
+            ctx.fillStyle = '#70c5ce';
+            ctx.fillRect(0, 0, canvas.width, canvas.height);
+
+            // Ptáček
+            ctx.fillStyle = 'white';
+            ctx.beginPath();
+            ctx.arc(bird.x, bird.y, 12, 0, Math.PI * 2);
+            ctx.fill();
+            ctx.strokeStyle = '#333'; ctx.lineWidth = 2; ctx.stroke();
+            // Oko a ucho
+            ctx.fillStyle = 'black'; ctx.beginPath(); ctx.arc(bird.x + 5, bird.y - 2, 2, 0, Math.PI * 2); ctx.fill();
+            ctx.beginPath(); ctx.ellipse(bird.x - 2, bird.y - 15, 4, 10, 0, 0, Math.PI * 2); ctx.fillStyle = 'white'; ctx.fill(); ctx.stroke();
+
+
+            // Trubky
+            ctx.fillStyle = '#81c784';
+            ctx.strokeStyle = '#2e7d32';
+            pipes.forEach(p => {
+                ctx.fillRect(p.x, 0, 40, p.topH);
+                ctx.strokeRect(p.x, 0, 40, p.topH);
+
+                ctx.fillRect(p.x, p.topH + p.gap, 40, canvas.height);
+                ctx.strokeRect(p.x, p.topH + p.gap, 40, canvas.height);
+            });
+
+            loopRef = requestAnimationFrame(loop);
+        }
+
+        loadGame();
+        setInterval(() => {
+            stats.hunger = Math.max(0, stats.hunger - 1);
+            stats.sleep = Math.max(0, stats.sleep - 1);
+            stats.fun = Math.max(0, stats.fun - 1);
+            updateUI();
+        }, 3000);
+
+        // 2. Oprava funkce closeTV pro přičítání zábavy
+        // (Tato funkce přepíše tu původní prázdnou/nefunkční)
+        function closeTV() {
+            gameRunning = false;
+            cancelAnimationFrame(loopRef);
+            document.getElementById('tv-screen').style.display = 'none';
+            if (score > 0) {
+                let bonus = Math.floor(score * 3);
+                stats.fun += bonus;
+                if (stats.fun > 100) stats.fun = 100;
+                showPopup(`Hraní tě bavilo! (+${bonus}% zábavy)`);
+                updateUI();
+            }
+        }
+    </script>
+</body>
+</html>
