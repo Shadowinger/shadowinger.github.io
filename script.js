@@ -48,14 +48,16 @@ form.addEventListener("submit", async (event) => {
   submitButton.disabled = true;
 
   try {
-    // Apps Script web apps usually don't return CORS headers; no-cors allows safe submit from GitHub Pages.
+    // Apps Script web apps are more reliable with form-urlencoded payload from static sites.
+    const body = new URLSearchParams(payload).toString();
+
     await fetch(GOOGLE_SCRIPT_ENDPOINT, {
       method: "POST",
       mode: "no-cors",
       headers: {
-        "Content-Type": "application/json"
+        "Content-Type": "application/x-www-form-urlencoded;charset=UTF-8"
       },
-      body: JSON.stringify(payload)
+      body
     });
 
     form.reset();
