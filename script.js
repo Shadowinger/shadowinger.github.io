@@ -1,4 +1,4 @@
-const FORMSPREE_ENDPOINT = "https://formspree.io/f/your-form-id";
+const GOOGLE_SCRIPT_ENDPOINT = "PASTE_YOUR_GOOGLE_APPS_SCRIPT_WEB_APP_URL_HERE";
 
 const form = document.getElementById("waitlist-form");
 const statusEl = document.getElementById("form-status");
@@ -33,6 +33,11 @@ form.addEventListener("submit", async (event) => {
     return;
   }
 
+  if (!GOOGLE_SCRIPT_ENDPOINT || GOOGLE_SCRIPT_ENDPOINT.includes("PASTE_YOUR")) {
+    setStatus("error", "Set your Google Apps Script Web App URL in script.js first.");
+    return;
+  }
+
   const payload = {
     email,
     name: String(formData.get("name") || "").trim(),
@@ -43,18 +48,15 @@ form.addEventListener("submit", async (event) => {
   submitButton.disabled = true;
 
   try {
-    const response = await fetch(FORMSPREE_ENDPOINT, {
+    // Apps Script web apps usually don't return CORS headers; no-cors allows safe submit from GitHub Pages.
+    await fetch(GOOGLE_SCRIPT_ENDPOINT, {
       method: "POST",
+      mode: "no-cors",
       headers: {
-        "Content-Type": "application/json",
-        Accept: "application/json"
+        "Content-Type": "application/json"
       },
       body: JSON.stringify(payload)
     });
-
-    if (!response.ok) {
-      throw new Error("Request failed");
-    }
 
     form.reset();
     setStatus("success", "You are on the list. We will contact you soon.");
