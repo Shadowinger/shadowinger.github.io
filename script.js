@@ -24,17 +24,17 @@ form.addEventListener("submit", async (event) => {
   const email = String(formData.get("email") || "").trim();
 
   if (!email) {
-    setStatus("error", "Email is required.");
+    setStatus("error", "E-mail je povinný.");
     return;
   }
 
   if (!validateEmail(email)) {
-    setStatus("error", "Please enter a valid email address.");
+    setStatus("error", "Zadej prosím platnou e-mailovou adresu.");
     return;
   }
 
   if (!GOOGLE_SCRIPT_ENDPOINT || GOOGLE_SCRIPT_ENDPOINT.includes("PASTE_YOUR")) {
-    setStatus("error", "Set your Google Apps Script Web App URL in script.js first.");
+    setStatus("error", "Nejdřív nastav URL Google Apps Script Web App v souboru script.js.");
     return;
   }
 
@@ -61,9 +61,9 @@ form.addEventListener("submit", async (event) => {
     });
 
     form.reset();
-    setStatus("success", "You are on the list. We will contact you soon.");
+    setStatus("success", "Jsi na čekací listině. Brzy se ti ozveme.");
   } catch (error) {
-    setStatus("error", "Submission failed. Please try again.");
+    setStatus("error", "Odeslání selhalo. Zkus to prosím znovu.");
   } finally {
     submitButton.disabled = false;
   }
