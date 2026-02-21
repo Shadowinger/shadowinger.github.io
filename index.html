@@ -1,0 +1,136 @@
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>MyTrace Waitlist | Track your health signals in one place</title>
+    <meta
+      name="description"
+      content="Join the MyTrace waitlist. Connect blood tests, supplements, nutrition, and daily habits in one health dashboard."
+    />
+
+    <meta property="og:title" content="MyTrace Waitlist" />
+    <meta
+      property="og:description"
+      content="Track your health signals in one place. Join early access for MyTrace."
+    />
+    <meta property="og:type" content="website" />
+    <meta property="og:url" content="https://mytrace.app" />
+    <meta property="og:image" content="https://mytrace.app/og-image.jpg" />
+
+    <link rel="preconnect" href="https://fonts.googleapis.com" />
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+    <link
+      href="https://fonts.googleapis.com/css2?family=Space+Grotesk:wght@400;500;700&family=Manrope:wght@400;600;700&display=swap"
+      rel="stylesheet"
+    />
+    <link rel="stylesheet" href="styles.css" />
+  </head>
+  <body>
+    <div class="bg-glow"></div>
+    <header class="topbar container">
+      <a class="brand" href="#">MyTrace</a>
+      <a class="contact-link" href="mailto:mytrace.apps@gmail.com">mytrace.apps@gmail.com</a>
+    </header>
+
+    <main>
+      <section class="hero container">
+        <p class="eyebrow">Early access</p>
+        <h1>Track your health signals in one place.</h1>
+        <p class="hero-subtitle">
+          MyTrace brings together blood markers, supplement routines, nutrition, and daily habits into one clear dashboard.
+        </p>
+        <a class="hero-cta" href="#waitlist">Join the waitlist</a>
+      </section>
+
+      <section class="benefits container" aria-label="Core benefits">
+        <article class="card">
+          <h3>Blood markers</h3>
+          <p>Upload lab results and instantly spot low, high, and critical flags.</p>
+        </article>
+        <article class="card">
+          <h3>Supplements</h3>
+          <p>Track dosage, adherence, and evidence level in one timeline.</p>
+        </article>
+        <article class="card">
+          <h3>Daily routine</h3>
+          <p>Log mood, stress, energy, sleep, and body metrics with quick check-ins.</p>
+        </article>
+        <article class="card">
+          <h3>Nutrition &amp; balance</h3>
+          <p>Monitor meals, calories, activity output, and net energy balance.</p>
+        </article>
+        <article class="card">
+          <h3>Insights</h3>
+          <p>See trends across your data and get smarter recommendations over time.</p>
+        </article>
+      </section>
+
+      <section class="waitlist container" id="waitlist">
+        <div>
+          <p class="eyebrow">Waitlist</p>
+          <h2>Get early access to MyTrace</h2>
+          <p>Be first to test a unified health dashboard focused on clarity and action.</p>
+        </div>
+
+        <form id="waitlist-form" novalidate>
+          <label for="email">Email *</label>
+          <input id="email" name="email" type="email" required autocomplete="email" />
+
+          <label for="name">Name</label>
+          <input id="name" name="name" type="text" autocomplete="name" />
+
+          <label for="goal">Primary goal</label>
+          <select id="goal" name="goal">
+            <option value="">Select your goal</option>
+            <option value="Energy">Energy</option>
+            <option value="Performance">Performance</option>
+            <option value="Longevity">Longevity</option>
+            <option value="General health">General health</option>
+          </select>
+
+          <button type="submit">Join the waitlist</button>
+          <p id="form-status" role="status" aria-live="polite"></p>
+        </form>
+      </section>
+
+      <section class="who container">
+        <p class="eyebrow">Who it’s for</p>
+        <h2>Built for people who take their health seriously</h2>
+        <div class="who-grid">
+          <p>Biohackers tracking biomarkers and protocols</p>
+          <p>Active people balancing training, recovery, and fuel</p>
+          <p>Health-conscious users who want one simple system</p>
+        </div>
+      </section>
+
+      <section class="faq container">
+        <p class="eyebrow">FAQ</p>
+        <h2>Questions</h2>
+        <details>
+          <summary>When is MyTrace launching?</summary>
+          <p>We are onboarding early users in phases. Waitlist members get first invites.</p>
+        </details>
+        <details>
+          <summary>Will MyTrace support lab uploads?</summary>
+          <p>Yes. Blood marker tracking and flagging are core parts of the product.</p>
+        </details>
+        <details>
+          <summary>Is MyTrace only for athletes?</summary>
+          <p>No. It is designed for anyone who wants better day-to-day health visibility.</p>
+        </details>
+        <details>
+          <summary>Will there be recommendations or e-shop integrations?</summary>
+          <p>Yes, this is planned for future versions after the initial dashboard release.</p>
+        </details>
+      </section>
+    </main>
+
+    <footer class="footer container">
+      <p>Contact: <a href="mailto:mytrace.apps@gmail.com">mytrace.apps@gmail.com</a></p>
+      <p>© <span id="year"></span> MyTrace</p>
+    </footer>
+
+    <script src="script.js"></script>
+  </body>
+</html>
