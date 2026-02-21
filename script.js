@@ -1,4 +1,4 @@
-const GOOGLE_SCRIPT_ENDPOINT = "PASTE_YOUR_GOOGLE_APPS_SCRIPT_WEB_APP_URL_HERE";
+const GOOGLE_SCRIPT_ENDPOINT = "https://script.google.com/macros/s/AKfycbxZH91-Z0pRifw6KaCjyShQtc9OfjNod3IbxbKi82700Htnj74mIez1DnZFRtJbpSXrOw/exec";
 
 const form = document.getElementById("waitlist-form");
 const statusEl = document.getElementById("form-status");
